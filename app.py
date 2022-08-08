@@ -12,10 +12,6 @@ import socket
 from os.path import exists
 import subprocess
 
-
-app = Flask(__name__)
-
-
 def create_connection_db(database,user, password, host, port): 
     myDB = pw.MySQLDatabase(database,user=user,passwd=password, host=host,port=port)
     return myDB
@@ -91,8 +87,7 @@ def is_testing_enable():
         print("error", error)
         return False
 
-    
-@app.route('/')
+
 def hello():
     file_exists = exists('/etc/squid/squid.conf')
     if file_exists:
@@ -108,7 +103,6 @@ def hello():
     return '<h1>Hello, World!!!</h1>'
 
 
-@app.route('/cache_test')
 def cache_test():
 
     while True:
@@ -126,6 +120,8 @@ def cache_test():
 
     return 'True'
 
+var = hello()
+print(var)
 
-app.config["DEBUG"] = True
-app.run()
+var2 = cache_test()
+print(var2)
