@@ -96,10 +96,10 @@ def hello():
             node_address=socket.gethostbyname(socket.gethostname())
         )
     else:
-        cache_node = CacheNodesTest.create(
-            node_type="client",
-            node_address=socket.gethostbyname(socket.gethostname())
-        )
+#         cache_node = CacheNodesTest.create(
+#             node_type="client",
+#             node_address=socket.gethostbyname(socket.gethostname())
+#         )
     return '<h1>Hello, World!!!</h1>'
 
 
@@ -122,8 +122,8 @@ def cache_test():
 
     return 'True'
 
-var = hello()
-print(var)
+# var = hello()
+# print(var)
 
 var2 = cache_test()
 print(var2)
