@@ -109,7 +109,9 @@ def cache_test():
         if is_testing_enable():
             try:
                 cache_proxy = CacheNodesTest.select().where(CacheNodesTest.node_type == 'proxy').get()
-                runcmd("wget -e use_proxy=yes -e http_proxy=http://"+cache_proxy.node_address+":3128 -r -np http://download.cirros-cloud.net/0.5.2/", verbose = False)
+                command = "wget -e use_proxy=yes -e http_proxy=http://"+cache_proxy.node_address+":3128 -r -np http://download.cirros-cloud.net/0.5.2/"
+                print(command)
+                runcmd(command, verbose = False)
                 return 'Execução do wget finalizada.'
             except Exception as error:
                 return 'Erro na execução do wget.'
