@@ -72,8 +72,8 @@ def runcmd(cmd, verbose = False, *args, **kwargs):
     pass
 
 def wget_command(proxy_ip):
-    runcmd("wget -e use_proxy=yes -e http_proxy=http://"+proxy_ip+":3128 -r -np http://download.cirros-cloud.net/0.5.2/", verbose = False)   
-    return 'as'
+    r = runcmd("wget -e use_proxy=yes -e http_proxy=http://"+proxy_ip+":3128 -r -np http://download.cirros-cloud.net/0.5.2/", verbose = False)   
+    return r
 
 def is_testing_enable():
     service_id = 1
@@ -107,24 +107,25 @@ def hello():
     return '<h1>Hello, World!!!</h1>'
 
 
-def cache_test():
+def cache_test(cache_proxy_inner):
     while True:
         toogle_test = 0
         if is_testing_enable():
             toogle_test = 1
             cache_client = CacheNodesTest.select().where(CacheNodesTest.node_type == 'client').get()
             try:
+                print(node_address, cache_client.node_address)
                 if node_address in cache_client.node_address:
                     print('PRIMEIRO CLIENTE FAZENDO DOWNLOAD.')
                     cache_client.node_status = 'caching'
                     cache_client.save()
-                    wget_command(cache_proxy.node_address)
+                    wget_command(cache_proxy_inner.node_address)
                     cache_client.node_status = 'finished'
                     cache_client.save()
                     return 'PRIMEIRO CLIENTE - Execução do wget finalizada.'
                 elif 'finished' in cache_client.node_status: #caching/waiting/finished
                     print('DEMAIS CLIENTES FAZENDO DOWNLOAD.')
-                    wget_command(cache_proxy.node_address)
+                    wget_command(cache_proxy_inner.node_address)
                     # runcmd("wget -e use_proxy=yes -e http_proxy=http://"+cache_proxy.node_address+":3128 -r -np http://download.cirros-cloud.net/0.5.2/", verbose = False)
                     return 'DEMAIS CLIENTES - Execução do wget finalizada.'
                 else:                    
@@ -132,7 +133,7 @@ def cache_test():
             except Exception as error:
                 return 'Erro na execução do wget.'
         elif toogle_test == 0:
-            print('Aguardando teste inicializar...')            
+            print('Aguardando teste inicializar...', is_testing_enable())            
         time.sleep(1)
     return 'True'
 
@@ -140,7 +141,7 @@ def cache_test():
 # print(var)
 cache_proxy = CacheNodesTest.select().where(CacheNodesTest.node_type == 'proxy').get()
 node_address=socket.gethostbyname(socket.gethostname()) 
-var2 = cache_test()
+var2 = cache_test(cache_proxy)
 print(var2)
 service_id = 1
 service = Services.select().where(Services.id_service == service_id).get()
