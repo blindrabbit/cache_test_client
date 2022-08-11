@@ -122,14 +122,14 @@ def cache_test(cache_proxy_inner):
                     cache_client.node_status = 'caching'
                     cache_client.save()
                     # wget_command(cache_proxy_inner.node_address)
-                    runcmd("wget -e use_proxy=yes -e http_proxy=http://"+cache_proxy.node_address+":3128 -r -np http://download.cirros-cloud.net/0.3.0/", verbose = False)
+                    runcmd("wget -e use_proxy=yes -e http_proxy=http://"+cache_proxy_inner.node_address+":3128 -r -np http://download.cirros-cloud.net/0.3.0/", verbose = False)
                     cache_client.node_status = 'finished'
                     cache_client.save()
                     return 'PRIMEIRO CLIENTE - Execução do wget finalizada.'
                 elif 'finished' in cache_client.node_status: #caching/waiting/finished
                     print('DEMAIS CLIENTES FAZENDO DOWNLOAD.')
                     # wget_command(cache_proxy_inner.node_address)
-                    runcmd("wget -e use_proxy=yes -e http_proxy=http://"+cache_proxy.node_address+":3128 -r -np http://download.cirros-cloud.net/0.3.0/", verbose = False)
+                    runcmd("wget -e use_proxy=yes -e http_proxy=http://"+cache_proxy_inner.node_address+":3128 -r -np http://download.cirros-cloud.net/0.3.0/", verbose = False)
                     return 'DEMAIS CLIENTES - Execução do wget finalizada.'
                 else:                    
                     print('AGUARDANDO PRIMEIRO CLIENTE FINALIZAR O CACHE DOWNLOAD.')
