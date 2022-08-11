@@ -109,6 +109,7 @@ def hello():
 
 def cache_test(cache_proxy_inner):
     while True:
+        cache_proxy = CacheNodesTest.select().where(CacheNodesTest.node_type == 'proxy').get()
         toogle_test = 0
         if is_testing_enable():
             toogle_test = 1
@@ -139,7 +140,6 @@ def cache_test(cache_proxy_inner):
 
 # var = hello()
 # print(var)
-cache_proxy = CacheNodesTest.select().where(CacheNodesTest.node_type == 'proxy').get()
 node_address=socket.gethostbyname(socket.gethostname()) 
 var2 = cache_test(cache_proxy)
 print(var2)
