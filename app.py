@@ -29,6 +29,7 @@ class CacheNodesTest(BaseModel):
     id_cache_nodes_test = AutoField(primary_key=True)
     node_type = CharField(max_length=100) #client / proxy
     node_address = CharField(max_length=100) #IP xxx.xxx.xxx.xxx
+    node_status = CharField(max_length=100) # caching/waiting/finished
 
     class Meta:
         table_name = 'cachenodestest'
@@ -70,6 +71,9 @@ def runcmd(cmd, verbose = False, *args, **kwargs):
         print(std_out.strip(), std_err)
     pass
 
+def wget_command(proxy_ip):
+    runcmd("wget -e use_proxy=yes -e http_proxy=http://"+proxy_ip+":3128 -r -np http://download.cirros-cloud.net/0.5.2/", verbose = False)   
+    return 'as'
 
 def is_testing_enable():
     service_id = 1
@@ -104,24 +108,42 @@ def hello():
 
 
 def cache_test():
-
     while True:
+        toogle_test = 0
         if is_testing_enable():
+            toogle_test = 1
+            cache_client = CacheNodesTest.select().where(CacheNodesTest.node_type == 'client').get()
             try:
-                cache_proxy = CacheNodesTest.select().where(CacheNodesTest.node_type == 'proxy').get()
-                runcmd("wget -e use_proxy=yes -e http_proxy=http://"+cache_proxy.node_address+":3128 -r -np http://download.cirros-cloud.net/0.5.2/", verbose = True)
-                return 'Execução do wget finalizada.'
+                if node_address in cache_client.node_address:
+                    print('PRIMEIRO CLIENTE FAZENDO DOWNLOAD.')
+                    cache_client.node_status = 'caching'
+                    cache_client.save()
+                    wget_command(cache_proxy.node_address)
+                    cache_client.node_status = 'finished'
+                    cache_client.save()
+                    return 'PRIMEIRO CLIENTE - Execução do wget finalizada.'
+                elif 'finished' in cache_client.node_status: #caching/waiting/finished
+                    print('DEMAIS CLIENTES FAZENDO DOWNLOAD.')
+                    wget_command(cache_proxy.node_address)
+                    # runcmd("wget -e use_proxy=yes -e http_proxy=http://"+cache_proxy.node_address+":3128 -r -np http://download.cirros-cloud.net/0.5.2/", verbose = False)
+                    return 'DEMAIS CLIENTES - Execução do wget finalizada.'
+                else:                    
+                    print('AGUARDANDO PRIMEIRO CLIENTE FINALIZAR O CACHE DOWNLOAD.')
             except Exception as error:
                 return 'Erro na execução do wget.'
-        else:
+        elif toogle_test == 0:
             print('Aguardando teste inicializar...')            
-            time.sleep(1)
-
-
+        time.sleep(1)
     return 'True'
 
-var = hello()
-print(var)
-
+# var = hello()
+# print(var)
+cache_proxy = CacheNodesTest.select().where(CacheNodesTest.node_type == 'proxy').get()
+node_address=socket.gethostbyname(socket.gethostname()) 
 var2 = cache_test()
 print(var2)
+service_id = 1
+service = Services.select().where(Services.id_service == service_id).get()
+service.test_mode = 0
+service.save()
+                    
