@@ -92,25 +92,8 @@ def is_testing_enable():
         return False
 
 
-def hello():
-    file_exists = exists('/etc/squid/squid.conf')
-    if file_exists:
-        cache_node = CacheNodesTest.create(
-            node_type="proxy",
-            node_address=socket.gethostbyname(socket.gethostname())
-        )
-    else:
-        cache_node = CacheNodesTest.create(
-            node_type="client",
-            node_address=socket.gethostbyname(socket.gethostname())
-        )
-    return '<h1>Hello, World!!!</h1>'
-
-
 def cache_test(cache_proxy_inner):
     while True:
-        service_id = 1
-        service = Services.select().where(Services.id_service == service_id).get()
         toogle_test = 0
         if is_testing_enable():
             toogle_test = 1
@@ -122,7 +105,9 @@ def cache_test(cache_proxy_inner):
                     cache_client.node_status = 'caching'
                     cache_client.save()
                     # wget_command(cache_proxy_inner.node_address)
-                    runcmd("wget -e use_proxy=yes -e http_proxy=http://"+cache_proxy_inner.node_address+":3128 -r -np http://download.cirros-cloud.net/0.3.0/", verbose = False)
+                    cmd = "wget -e use_proxy=yes -e http_proxy=http://"+cache_proxy_inner.node_address+":3128 -r -np http://download.cirros-cloud.net/0.3.0/"
+                    print(cmd)
+                    runcmd(cmd, verbose = False)
                     cache_client.node_status = 'finished'
                     cache_client.save()
                     return 'PRIMEIRO CLIENTE - Execução do wget finalizada.'
