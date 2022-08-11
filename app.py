@@ -121,14 +121,15 @@ def cache_test(cache_proxy_inner):
                     print('PRIMEIRO CLIENTE FAZENDO DOWNLOAD.')
                     cache_client.node_status = 'caching'
                     cache_client.save()
-                    wget_command(cache_proxy_inner.node_address)
+                    # wget_command(cache_proxy_inner.node_address)
+                    runcmd("wget -e use_proxy=yes -e http_proxy=http://"+cache_proxy.node_address+":3128 -r -np http://download.cirros-cloud.net/0.3.0/", verbose = False)
                     cache_client.node_status = 'finished'
                     cache_client.save()
                     return 'PRIMEIRO CLIENTE - Execução do wget finalizada.'
                 elif 'finished' in cache_client.node_status: #caching/waiting/finished
                     print('DEMAIS CLIENTES FAZENDO DOWNLOAD.')
-                    wget_command(cache_proxy_inner.node_address)
-                    # runcmd("wget -e use_proxy=yes -e http_proxy=http://"+cache_proxy.node_address+":3128 -r -np http://download.cirros-cloud.net/0.5.2/", verbose = False)
+                    # wget_command(cache_proxy_inner.node_address)
+                    runcmd("wget -e use_proxy=yes -e http_proxy=http://"+cache_proxy.node_address+":3128 -r -np http://download.cirros-cloud.net/0.3.0/", verbose = False)
                     return 'DEMAIS CLIENTES - Execução do wget finalizada.'
                 else:                    
                     print('AGUARDANDO PRIMEIRO CLIENTE FINALIZAR O CACHE DOWNLOAD.')
@@ -145,8 +146,8 @@ node_address=socket.gethostbyname(socket.gethostname())
 cache_proxy = CacheNodesTest.select().where(CacheNodesTest.node_type == 'proxy').get()        
 var2 = cache_test(cache_proxy)
 print(var2)
-service_id = 1
-service = Services.select().where(Services.id_service == service_id).get()
-service.test_mode = 0
-service.save()
+# service_id = 1
+# service = Services.select().where(Services.id_service == service_id).get()
+# service.test_mode = 0
+# service.save()
                     
